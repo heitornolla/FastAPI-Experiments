@@ -2,10 +2,12 @@ from http import HTTPStatus
 
 from fastapi import FastAPI
 
-from fastapi_project.schemas import Message, UserPublic, UserSchema
+from fastapi_project.schemas import Message, UserPublic, UserSchema, UserDB
 
 app = FastAPI()
 
+# fake in-memory database
+database = []
 
 @app.get('/', status_code=HTTPStatus.OK, response_model=Message)
 def read_root():
@@ -14,4 +16,7 @@ def read_root():
 
 @app.post('/users/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
 def create_user(user: UserSchema):
-    return user
+    user_with_id = UserDB(**user.model_dump(), id=len(database)+1)
+
+    database.append(user_with_id)
+    return user_with_id
