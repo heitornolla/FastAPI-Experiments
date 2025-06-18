@@ -25,7 +25,7 @@ def test_create_user(client):
         'id': 1,
     }
 
-
+# Dependent test is a code smell
 def test_read_users(client):
     response = client.get('/users/')
 
