@@ -39,10 +39,18 @@ def update_user(user_id: int, user: UserSchema):
     user = UserDB(**user.model_dump(), id=user_id)
 
     if user_id < 1 or user_id > len(database):
-        raise HTTPException(
-            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
-        )
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
 
     database[user_id - 1] = user
 
     return user
+
+
+@app.delete('/users/{user_id}', status_code=HTTPStatus.OK, response_model=Message)
+def delete_user(user_id: int):
+    if user_id < 1 or user_id > len(database):
+        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
+
+    database.pop(user_id - 1)
+
+    return {'message': 'User deleted'}

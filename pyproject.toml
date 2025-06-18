@@ -24,7 +24,7 @@ ruff = "^0.12.0"
 
 
 [tool.ruff]
-line-length = 82
+line-length = 100
 extend-exclude = ['migrations']
 
 [tool.ruff.lint]
