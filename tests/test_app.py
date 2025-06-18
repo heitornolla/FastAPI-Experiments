@@ -1,22 +1,24 @@
 from http import HTTPStatus
 
+import pytest
 from fastapi.testclient import TestClient
 
 from fastapi_project.app import app
 
 
-def test_root_hello_world():
-    client = TestClient(app)
+@pytest.fixture
+def client():
+    return TestClient(app)
 
+
+def test_root_hello_world(client):
     response = client.get('/')
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'Olá Mundo!'}
 
 
-def test_create_user():
-    client = TestClient(app)
-
+def test_create_user(client):
     response = client.post(
         '/users/',
         json={
