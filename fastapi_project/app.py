@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 
 from fastapi_project.schemas import (
     Message,
@@ -32,3 +32,17 @@ def create_user(user: UserSchema):
 
     database.append(user_with_id)
     return user_with_id
+
+
+@app.put('/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic)
+def update_user(user_id: int, user: UserSchema):
+    user = UserDB(**user.model_dump(), id=user_id)
+
+    if user_id < 1 or user_id > len(database):
+        raise HTTPException(
+            status_code=HTTPStatus.NOT_FOUND, detail='User not found'
+        )
+
+    database[user_id - 1] = user
+
+    return user
