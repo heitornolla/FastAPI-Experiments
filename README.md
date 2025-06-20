@@ -2,6 +2,10 @@
 
 Experimenting building a basic CRUD API following a TDD dev style with CI/CD tools
 
+## Technologies Used
+
+Python 3.13, FastAPI, SQLAlchemy, Alembic, Pydantic, Pytest, Poetry w/ taskipy & ruff
+
 ## Shortcuts
 
 ### Install Dependencies
