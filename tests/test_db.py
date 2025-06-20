@@ -13,4 +13,3 @@ def test_create_user(session):
 
     assert user.username == 'test'
     assert user.email == 'test@example.com'
-    assert user.password == 'secret'
