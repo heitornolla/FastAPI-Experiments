@@ -27,3 +27,11 @@ poetry run task format
 ```bash
 poetry run task test
 ```
+
+### Run the API
+
+### Check linter (Ruff)
+
+```bash
+poetry run task run
+```
