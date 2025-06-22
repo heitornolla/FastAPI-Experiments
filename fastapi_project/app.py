@@ -25,8 +25,10 @@ def read_root():
 
 
 @app.get('/users/', status_code=HTTPStatus.OK, response_model=UserList)
-def get_users():
-    return {'users': database}
+def get_users(limit=10, offset=0, session=Depends(get_session)):
+    users = session.scalars(select(User).offset(offset).limit(limit)).all()
+
+    return {'users': users}
 
 
 @app.post('/users/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
