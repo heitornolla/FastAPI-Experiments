@@ -1,8 +1,7 @@
 from http import HTTPStatus
 
 from fastapi import Depends, FastAPI, HTTPException
-from sqlalchemy import create_engine, select
-from sqlalchemy.orm import Session
+from sqlalchemy import select
 
 from fastapi_project.database import get_session
 from fastapi_project.models import User
@@ -13,7 +12,6 @@ from fastapi_project.schemas import (
     UserPublic,
     UserSchema,
 )
-from fastapi_project.settings import Settings
 
 app = FastAPI()
 
@@ -32,7 +30,7 @@ def get_users():
 
 
 @app.post('/users/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session = Depends(get_session)):
+def create_user(user: UserSchema, session=Depends(get_session)):
     db_register = session.scalar(
         select(User).where((User.email == user.email) | (User.username == user.username))
     )
