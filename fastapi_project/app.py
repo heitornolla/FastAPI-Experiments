@@ -71,3 +71,8 @@ def delete_user(user_id: int, session=Depends(get_session)):
 
     if not user_db:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
+
+    session.delete(user_db)
+    session.commit()
+
+    return {'message': 'User deleted'}
