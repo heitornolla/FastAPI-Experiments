@@ -43,7 +43,7 @@ def test_read_users_with_users(client, user):
     assert response.json() == {'users': [user_schema]}
 
 
-def test_update_user(client):
+def test_update_user(client, user):
     response = client.put(
         url='/users/1/',
         json={

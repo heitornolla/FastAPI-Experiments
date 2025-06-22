@@ -7,16 +7,12 @@ from fastapi_project.database import get_session
 from fastapi_project.models import User
 from fastapi_project.schemas import (
     Message,
-    UserDB,
     UserList,
     UserPublic,
     UserSchema,
 )
 
 app = FastAPI()
-
-# fake in-memory database
-database = []
 
 
 @app.get('/', status_code=HTTPStatus.OK, response_model=Message)
@@ -52,22 +48,26 @@ def create_user(user: UserSchema, session=Depends(get_session)):
 
 
 @app.put('/users/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic)
-def update_user(user_id: int, user: UserSchema):
-    user = UserDB(**user.model_dump(), id=user_id)
+def update_user(user_id: int, user: UserSchema, session=Depends(get_session)):
+    user_db = session.scalar(select(User).where(User.id == user_id))
 
-    if user_id < 1 or user_id > len(database):
+    if not user_db:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
 
-    database[user_id - 1] = user
+    user_db.email = user.email
+    user_db.username = user.username
+    user_db.password = user.password
 
-    return user
+    session.add(user_db)
+    session.commit()
+    session.refresh(user_db)
+
+    return user_db
 
 
 @app.delete('/users/{user_id}', status_code=HTTPStatus.OK, response_model=Message)
-def delete_user(user_id: int):
-    if user_id < 1 or user_id > len(database):
+def delete_user(user_id: int, session=Depends(get_session)):
+    user_db = session.scalar(select(User).where(User.id == user_id))
+
+    if not user_db:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
-
-    database.pop(user_id - 1)
-
-    return {'message': 'User deleted'}
