@@ -88,13 +88,11 @@ def update_user(
 
 
 @app.delete('/users/{user_id}', status_code=HTTPStatus.OK, response_model=Message)
-def delete_user(user_id: int, session=Depends(get_session)):
-    user_db = session.scalar(select(User).where(User.id == user_id))
+def delete_user(user_id: int, session=Depends(get_session), current_user=Depends(get_current_user)):
+    if current_user.id != user_id:
+        raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail='Not allowed')
 
-    if not user_db:
-        raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail='User not found')
-
-    session.delete(user_db)
+    session.delete(current_user)
     session.commit()
 
     return {'message': 'User deleted'}

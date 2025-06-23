@@ -55,19 +55,14 @@ def test_update_user(client, user, token):
     }
 
 
-def test_delete_user(client, user):
-    response = client.delete(url='/users/1/')
+def test_delete_user(client, user, token):
+    response = client.delete(
+        url=f'/users/{user.id}/',
+        headers={'Authorization': f'Bearer {token}'},
+    )
 
     assert response.status_code == HTTPStatus.OK
     assert response.json() == {'message': 'User deleted'}
-
-
-def test_delete_invalid_user(client):
-    response = client.delete(
-        url='/users/-1/',
-    )
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_update_integrity_error(client, user, token):
