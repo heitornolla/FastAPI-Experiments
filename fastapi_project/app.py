@@ -1,6 +1,7 @@
 from http import HTTPStatus
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
 
@@ -12,7 +13,7 @@ from fastapi_project.schemas import (
     UserPublic,
     UserSchema,
 )
-from fastapi_project.security import get_password_hash
+from fastapi_project.security import get_password_hash, verify_password
 
 app = FastAPI()
 
@@ -86,3 +87,20 @@ def delete_user(user_id: int, session=Depends(get_session)):
     session.commit()
 
     return {'message': 'User deleted'}
+
+
+@app.post('/token')
+def login_for_acess_token(
+    form_data: OAuth2PasswordRequestForm = Depends(), session=Depends(get_session)
+):
+    user = session.scalar(select(User)).where(User.email == form_data.username)
+
+    if not user:
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED, detail='Incorrect email or password'
+        )
+
+    if not verify_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=HTTPStatus.UNAUTHORIZED, detail='Incorrect email or password'
+        )
