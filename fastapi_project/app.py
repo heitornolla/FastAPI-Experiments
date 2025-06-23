@@ -14,7 +14,12 @@ from fastapi_project.schemas import (
     UserPublic,
     UserSchema,
 )
-from fastapi_project.security import create_access_token, get_password_hash, verify_password
+from fastapi_project.security import (
+    create_access_token,
+    get_current_user,
+    get_password_hash,
+    verify_password,
+)
 
 app = FastAPI()
 
@@ -25,7 +30,9 @@ def read_root():
 
 
 @app.get('/users/', status_code=HTTPStatus.OK, response_model=UserList)
-def get_users(limit=10, offset=0, session=Depends(get_session)):
+def get_users(
+    limit=10, offset=0, session=Depends(get_session), current_user=Depends(get_current_user)
+):
     users = session.scalars(select(User).offset(offset).limit(limit)).all()
 
     return {'users': users}
