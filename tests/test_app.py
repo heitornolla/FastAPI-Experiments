@@ -36,9 +36,10 @@ def test_read_users(client, user, token):
     assert response.json() == {'users': [user_schema]}
 
 
-def test_update_user(client, user):
+def test_update_user(client, user, token):
     response = client.put(
         url='/users/1/',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'updated',
             'email': 'new_email@example.com',
@@ -52,19 +53,6 @@ def test_update_user(client, user):
         'email': 'new_email@example.com',
         'id': 1,
     }
-
-
-def test_update_invalid_user(client):
-    response = client.put(
-        url='/users/-1/',
-        json={
-            'username': 'updated',
-            'email': 'new_email@example.com',
-            'password': 'new_password',
-        },
-    )
-
-    assert response.status_code == HTTPStatus.NOT_FOUND
 
 
 def test_delete_user(client, user):
@@ -82,10 +70,10 @@ def test_delete_invalid_user(client):
     assert response.status_code == HTTPStatus.NOT_FOUND
 
 
-def test_update_integrity_error(client, user):
+def test_update_integrity_error(client, user, token):
     # Criando um registro para "bob"
     client.post(
-        '/users',
+        '/users/',
         json={
             'username': 'bob',
             'email': 'bob@example.com',
@@ -96,6 +84,7 @@ def test_update_integrity_error(client, user):
     # Alterando o user.username das fixture para bob
     response_update = client.put(
         f'/users/{user.id}',
+        headers={'Authorization': f'Bearer {token}'},
         json={
             'username': 'bob',
             'email': 'email@example.com',
