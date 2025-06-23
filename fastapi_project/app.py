@@ -12,6 +12,7 @@ from fastapi_project.schemas import (
     UserPublic,
     UserSchema,
 )
+from fastapi_project.security import get_password_hash
 
 app = FastAPI()
 
@@ -40,7 +41,9 @@ def create_user(user: UserSchema, session=Depends(get_session)):
         elif db_register.email == user.email:
             raise HTTPException(status_code=HTTPStatus.CONFLICT, detail='Email already exists')
 
-    db_user = User(username=user.username, password=user.password, email=user.email)
+    db_user = User(
+        username=user.username, password=get_password_hash(user.password), email=user.email
+    )
     session.add(db_user)
     session.commit()
     session.refresh(db_user)
@@ -58,7 +61,7 @@ def update_user(user_id: int, user: UserSchema, session=Depends(get_session)):
     try:
         user_db.email = user.email
         user_db.username = user.username
-        user_db.password = user.password
+        user_db.password = get_password_hash(user.password)
 
         session.add(user_db)
         session.commit()
