@@ -9,6 +9,7 @@ from fastapi_project.database import get_session
 from fastapi_project.models import User
 from fastapi_project.schemas import (
     Message,
+    Token,
     UserList,
     UserPublic,
     UserSchema,
@@ -89,7 +90,7 @@ def delete_user(user_id: int, session=Depends(get_session)):
     return {'message': 'User deleted'}
 
 
-@app.post('/token')
+@app.post('/token/', response_model=Token)
 def login_for_acess_token(
     form_data: OAuth2PasswordRequestForm = Depends(), session=Depends(get_session)
 ):
