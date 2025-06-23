@@ -94,7 +94,7 @@ def delete_user(user_id: int, session=Depends(get_session)):
 def login_for_acess_token(
     form_data: OAuth2PasswordRequestForm = Depends(), session=Depends(get_session)
 ):
-    user = session.scalar(select(User)).where(User.email == form_data.username)
+    user = session.scalar(select(User).where(User.email == form_data.username))
 
     if not user:
         raise HTTPException(
