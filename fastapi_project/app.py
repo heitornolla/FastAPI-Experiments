@@ -14,7 +14,7 @@ from fastapi_project.schemas import (
     UserPublic,
     UserSchema,
 )
-from fastapi_project.security import get_password_hash, verify_password
+from fastapi_project.security import create_access_token, get_password_hash, verify_password
 
 app = FastAPI()
 
@@ -105,3 +105,7 @@ def login_for_acess_token(
         raise HTTPException(
             status_code=HTTPStatus.UNAUTHORIZED, detail='Incorrect email or password'
         )
+
+    access_token = create_access_token(data={'sub': user.email})
+
+    return {'access_token': access_token, 'token_type': 'Bearer'}
