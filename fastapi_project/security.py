@@ -13,7 +13,7 @@ from fastapi_project.database import get_session
 from fastapi_project.models import User
 
 pwd_context = PasswordHash.recommended()
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 SECRET_KEY = ''
 ALGORITHM = 'HS256'
