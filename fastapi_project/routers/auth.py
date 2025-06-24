@@ -19,7 +19,7 @@ router = APIRouter(prefix='/auth', tags=['auth'])
 
 
 @router.post('/token/', response_model=Token)
-def login_for_acess_token(form_data: OAuth2PasswordRequestForm = OAuth2Form, session=Session):
+def login_for_acess_token(form_data: OAuth2Form, session=Session):
     user = session.scalar(select(User).where(User.email == form_data.username))
 
     if not user:
