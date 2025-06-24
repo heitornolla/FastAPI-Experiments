@@ -11,15 +11,10 @@ from sqlalchemy.orm import Session
 
 from fastapi_project.database import get_session
 from fastapi_project.models import User
-
+from fastapi_project.security import Settings
 pwd_context = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
-
-SECRET_KEY = ''
-ALGORITHM = 'HS256'
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
-
-
+settings = Settings()
 def get_password_hash(password: str):
     return pwd_context.hash(password)
 
@@ -32,11 +27,11 @@ def create_access_token(data: dict):
     to_encode = data.copy()
 
     # Expires in 30 mins
-    expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
     to_encode.update({'exp': expire})
 
-    encoded_jwt = encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
     return encoded_jwt
 
 
@@ -48,7 +43,7 @@ def get_current_user(session: Session = Depends(get_session), token: str = Depen
     )
 
     try:
-        payload = decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        payload = decode(token, settings.SECRET_KEY, algorithms=settings.ALGORITHM)
         subject_email = payload.get('sub')
         if not subject_email:
             raise credentials_exception
