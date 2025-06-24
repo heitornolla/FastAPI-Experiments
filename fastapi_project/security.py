@@ -11,10 +11,13 @@ from sqlalchemy.orm import Session
 
 from fastapi_project.database import get_session
 from fastapi_project.models import User
-from fastapi_project.security import Settings
+from fastapi_project.settings import Settings
+
 pwd_context = PasswordHash.recommended()
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl='auth/token')
 settings = Settings()
+
+
 def get_password_hash(password: str):
     return pwd_context.hash(password)
 
@@ -27,7 +30,9 @@ def create_access_token(data: dict):
     to_encode = data.copy()
 
     # Expires in 30 mins
-    expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(tz=ZoneInfo('UTC')) + timedelta(
+        minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
+    )
 
     to_encode.update({'exp': expire})
 
