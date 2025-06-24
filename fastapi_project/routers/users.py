@@ -1,10 +1,8 @@
 from http import HTTPStatus
-from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy import select
 from sqlalchemy.exc import IntegrityError
-from sqlalchemy.orm import Session
 
 from fastapi_project.database import get_session
 from fastapi_project.models import User
@@ -19,21 +17,20 @@ from fastapi_project.security import (
     get_password_hash,
 )
 
-Session = Annotated[Session, Depends(get_session)]
-CurrentUser = Annotated[User, Depends(get_current_user)]
-
 router = APIRouter(prefix='/users', tags=['users'])
 
 
 @router.get('/', status_code=HTTPStatus.OK, response_model=UserList)
-def get_users(limit=10, offset=0, session=Session, current_user=CurrentUser):
+def get_users(
+    limit=10, offset=0, session=Depends(get_session), current_user=Depends(get_current_user)
+):
     users = session.scalars(select(User).offset(offset).limit(limit)).all()
 
     return {'users': users}
 
 
 @router.post('/', status_code=HTTPStatus.CREATED, response_model=UserPublic)
-def create_user(user: UserSchema, session=Session):
+def create_user(user: UserSchema, session=Depends(get_session)):
     db_register = session.scalar(
         select(User).where((User.email == user.email) | (User.username == user.username))
     )
@@ -55,7 +52,12 @@ def create_user(user: UserSchema, session=Session):
 
 
 @router.put('/{user_id}', status_code=HTTPStatus.OK, response_model=UserPublic)
-def update_user(user_id: int, user: UserSchema, session=Session, current_user=CurrentUser):
+def update_user(
+    user_id: int,
+    user: UserSchema,
+    session=Depends(get_session),
+    current_user=Depends(get_current_user),
+):
     if current_user.id != user_id:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail='Not allowed')
 
@@ -77,7 +79,7 @@ def update_user(user_id: int, user: UserSchema, session=Session, current_user=Cu
 
 
 @router.delete('/{user_id}', status_code=HTTPStatus.OK, response_model=Message)
-def delete_user(user_id: int, session=Session, current_user=CurrentUser):
+def delete_user(user_id: int, session=Depends(get_session), current_user=Depends(get_current_user)):
     if current_user.id != user_id:
         raise HTTPException(status_code=HTTPStatus.FORBIDDEN, detail='Not allowed')
 
