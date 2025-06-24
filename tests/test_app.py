@@ -93,7 +93,7 @@ def test_update_integrity_error(client, user, token):
 
 def test_get_token(client, user):
     response = client.post(
-        '/token/', data={'username': user.email, 'password': user.clean_password}
+        'auth/token/', data={'username': user.email, 'password': user.clean_password}
     )
 
     token = response.json()
