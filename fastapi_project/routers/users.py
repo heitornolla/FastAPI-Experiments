@@ -17,7 +17,7 @@ from fastapi_project.security import (
     get_password_hash,
 )
 
-router = APIRouter(prefix='/users' ,tags=['users'])
+router = APIRouter(prefix='/users', tags=['users'])
 
 
 @router.get('/', status_code=HTTPStatus.OK, response_model=UserList)
