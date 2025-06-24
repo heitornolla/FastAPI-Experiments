@@ -10,6 +10,7 @@ from fastapi_project.app import app
 from fastapi_project.database import get_session
 from fastapi_project.models import User, table_registry
 from fastapi_project.security import get_password_hash
+from fastapi_project.settings import Settings
 
 
 @pytest.fixture
@@ -77,3 +78,8 @@ def token(client, user):
     )
 
     return response.json()['access_token']
+
+
+@pytest.fixture
+def settings():
+    return Settings()
